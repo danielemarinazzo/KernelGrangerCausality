@@ -1,6 +1,5 @@
-function [cb cbt]=causality_trials(y,Y,xt,type,par,m,ntrials,th)
+function [cb cbt]=causality_trials(y,xt,type,par,m,ntrials,th)
 % Input:    y       : matrix (n x 1) of driver data;
-%           Y       : matrix (n x nvar) of conditioning variables;
 %           xt       : matrix (n x 1) of target data
 %                       nvar = number of conditioning time series
 %           n    = number of samples; ntrials = number of trials
@@ -13,7 +12,7 @@ function [cb cbt]=causality_trials(y,Y,xt,type,par,m,ntrials,th)
 %                      2 complex eigensystem
 %                      3 error in polypower
 %Last version now
-[n nvar]=size(Y);
+n=length(y);
 % for i=1:nvar;
 %     Y(:,i)=(Y(:,i)-mean(Y(:,i)))/std(Y(:,i));
 % end
@@ -21,7 +20,7 @@ function [cb cbt]=causality_trials(y,Y,xt,type,par,m,ntrials,th)
 % xt=(xt-mean(xt))/std(xt);
 
 
-Y=[Y xt];
+Y=xt;
 %%%N=lunghezza di ogni trial, M=numero di trials
 N=n/ntrials;
 order=m;
@@ -65,7 +64,7 @@ Xr=XY_past';
 cb=0;
 rr=0;
 pp=0;
-[VV, D, ifail]=filtro(Xr,type,par,f,true);
+[VV D ifail]=filtro(Xr,type,par,f,true);
 if ifail>0
     return
 end
@@ -83,6 +82,7 @@ if ifail>0
 end
 xv=x-V*V'*x;
 [rrt, ppt]=corr(xv,VN);
+
 rn=rrt.^2;
 cbt=sum(rn);
 thb=th/length(rrt);
