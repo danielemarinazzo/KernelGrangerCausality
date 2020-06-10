@@ -22,7 +22,7 @@ function [cb cbt]=causality_trials(y,Y,xt,type,par,m,ntrials,th)
 
 
 Y=[Y xt];
-%%%N=lunghezza di ogni trial, M=numero di trials
+%%% N=trial length, M = number of trials
 N=n/ntrials;
 order=m;
 M=ntrials;
@@ -43,13 +43,13 @@ for i=1:M
     y_past=[y_past;y_past_c];
 end
 
-%%%%%%%alla fine x è il target
+%%%%%%% x is the target
 
-%%%%%%%%%% Y_past è il passato senza la variabile driver
+%%%%%%%%%% Y_past is the past without the driver
 
-XY_past=[Y_past y_past]; %%% questo è il past anche con la variabile driver ... ora si possono applicare le cose di mario..
+XY_past=[Y_past y_past]; %%% past including the driver
 
-%%%%%%%%%%ora normalizzazione
+%%%%%%%%%% normalization
 x=(x-mean(x))/std(x);
 for j=1:size(Y_past,2)
     Y_past(:,j)=(Y_past(:,j)-mean(Y_past(:,j)))/std(Y_past(:,j));
