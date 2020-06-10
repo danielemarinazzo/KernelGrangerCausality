@@ -3,7 +3,7 @@ function [cb cbt]=causality_trials(y,xt,type,par,m,ntrials,th)
 %           xt       : matrix (n x 1) of target data
 %                       nvar = number of conditioning time series
 %           n    = number of samples; ntrials = number of trials
-%           type    : kernel function 'p' polinomial 'g' gaussian ;
+%           type    : kernel function 'p' polynomial 'g' gaussian ;
 %           par     : parameter of the kernel function;
 %           m       : order of the model
 % Output:   cb      :  y->xt
@@ -21,7 +21,7 @@ n=length(y);
 
 
 Y=xt;
-%%%N=lunghezza di ogni trial, M=numero di trials
+%%% N=trial length, M=number of trials
 N=n/ntrials;
 order=m;
 M=ntrials;
@@ -36,17 +36,17 @@ for i=1:M
     Y_past_c = reshape(Y((i-1)*N+past_ind,:),N-order,order*size(Y,2));
     y_past_c = reshape(y((i-1)*N+past_ind,:),N-order,order);
     %%%%%
-    %%%ora accumulo
+    %%% concatenate
     x=[x;xc];
     Y_past=[Y_past;Y_past_c];
     y_past=[y_past;y_past_c];
 end
 
-%%%%%%%alla fine x è il target
+%%%%%%% x is the target
 
-%%%%%%%%%% Y_past è il passato senza la variabile driver
+%%%%%%%%%% Y_past is the past of the system without the driver
 
-XY_past=[Y_past y_past]; %%% questo è il past anche con la variabile driver ... ora si possono applicare le cose di mario..
+XY_past=[Y_past y_past]; %%% past including the driver 
 
 %%%%%%%%%%ora normalizzazione
 x=(x-mean(x))/std(x);
