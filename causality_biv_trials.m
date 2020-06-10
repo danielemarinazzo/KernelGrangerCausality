@@ -1,4 +1,4 @@
-function [cb cbt]=causality_trials(y,xt,type,par,m,ntrials,th)
+function [cb cbt]=causality_biv_trials(y,xt,type,par,m,ntrials,th)
 % Input:    y       : matrix (n x 1) of driver data;
 %           xt       : matrix (n x 1) of target data
 %                       nvar = number of conditioning time series
