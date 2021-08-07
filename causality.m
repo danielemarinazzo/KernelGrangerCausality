@@ -1,10 +1,11 @@
-function [cb ifail rr pp]=causality(Y,type,par,m)
+function [cb ifail rr pp]=causality(Y,type,par,m,corrtype)
 % Input:    Y       : matrix  (n x nvar) of input data;
 %                       nvar = number of time series
 %                       n    = number of samples
 %           type    : kernel function 'p' polinomial 'g' gaussian ;
 %           par     : parameter of the kernel function;
 %           m       : order of the model   % default m=1;
+%           corrtype: type of multiple comparison correction ('Bonferroni'(default) or 'FDR');
 % Output:   cb      : cb(i,j) = i->j
 %           ifail   :  0 no error 
 %                      1 cholesky algoritm fail
@@ -14,6 +15,10 @@ function [cb ifail rr pp]=causality(Y,type,par,m)
 %Last versione (11/01/2011)
 if nargin<4
     m=1;
+    corrtype='Bonferroni';
+end
+if nargin<5
+    corrtype='Bonferroni';
 end
 [X x]=init_causality(Y,m);
 [nvar m n]=size(X);
@@ -45,8 +50,15 @@ for i=1:nvar
     rr(i,i,1:nc)=0;
     kk=kk+(nr-1)*nc;
 end
-rn=rr.^2;
-thb=th/kk;
-indpr=find(pp>thb);
-rn(indpr)=0;
-cb=sum(rn,3);
+cb=rr.^2;
+if corrtype="Bonferroni"
+    thb=th/kk;
+    indpr=find(pp>thb);
+    cb(indpr)=0;
+elseif corrtype="FDR"
+    h=fdr_bh(pp,th); % the output is 0 (nonsignificant) or 1 (significant)
+    cb=cb.*h;
+else
+    error('corrtype must be "Bonferroni" or "FDR")
+end
+
