@@ -1,4 +1,4 @@
-function [cb ifail rr pp]=causality(Y,type,par,m,corrtype)
+function [cb, ifail, rr, pp]=causality(Y,type,par,m,corrtype)
 % Input:    Y       : matrix  (n x nvar) of input data;
 %                       nvar = number of time series
 %                       n    = number of samples
@@ -43,21 +43,23 @@ for i=1:nvar
         return
     end
     xv=x-V*V'*x;
-    [rrt ppt]=corr(xv,VN);
-    [nr nc]=size(rrt);
+    [rrt, ppt]=corr(xv,VN);
+    [nr, nc]=size(rrt);
     rr(i,1:nr,1:nc)=rrt;
     pp(i,1:nr,1:nc)=ppt;
     rr(i,i,1:nc)=0;
     kk=kk+(nr-1)*nc;
 end
-cb=rr.^2;
+rn=rr.^2;save pp pp
 if corrtype=="Bonferroni"
     thb=th/kk;
-    indpr=find(pp>thb);
-    cb(indpr)=0;
+    indpr=pp>thb;
+    rn(indpr)=0;
+    cb=sum(rn,3);
 elseif corrtype=="FDR"
     h=fdr_bh(pp,th); % the output is 0 (nonsignificant) or 1 (significant)
-    cb=cb.*h;
+    rn=rn.*h;
+    cb=sum(rn,3);
 else
     error('corrtype must be "Bonferroni" or "FDR"')
 end
