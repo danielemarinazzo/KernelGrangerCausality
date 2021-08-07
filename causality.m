@@ -51,14 +51,14 @@ for i=1:nvar
     kk=kk+(nr-1)*nc;
 end
 cb=rr.^2;
-if corrtype="Bonferroni"
+if corrtype=="Bonferroni"
     thb=th/kk;
     indpr=find(pp>thb);
     cb(indpr)=0;
-elseif corrtype="FDR"
+elseif corrtype=="FDR"
     h=fdr_bh(pp,th); % the output is 0 (nonsignificant) or 1 (significant)
     cb=cb.*h;
 else
-    error('corrtype must be "Bonferroni" or "FDR")
+    error('corrtype must be "Bonferroni" or "FDR"')
 end
 
