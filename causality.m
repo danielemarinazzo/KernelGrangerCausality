@@ -7,7 +7,7 @@ function [cb, ifail, rr, pp]=causality(Y,type,par,m,corrtype)
 %           m       : order of the model   % default m=1;
 %           corrtype: type of multiple comparison correction ('Bonferroni'(default) or 'FDR');
 % Output:   cb      : cb(i,j) = i->j
-%           ifail   :  0 no error 
+%           ifail   :  0 no error
 %                      1 cholesky algoritm fail
 %                      2 complex eigenvalues
 %                      3 complex eigensystem
@@ -20,23 +20,41 @@ end
 if nargin<5
     corrtype='Bonferroni';
 end
-[X x]=init_causality(Y,m);
-[nvar m n]=size(X);
+[X, x]=init_causality(Y,m);
+[nvar, m, n]=size(X);
 f=1.e-6;
 th=0.05;
 Xr=reshape(X,nvar*m,n);
-[VV D ifail]=filtro(Xr,type,par,f,true);
+[VV, D, ifail]=filtro(Xr,type,par,f,true);
 cb=zeros(nvar,nvar);
 VT=VV*D.^0.5;
 polycall=true;
 kk=0;
+
+%%% this loop just to initialize the rr matrix %%%
+XX=X;
+XX(1,:,:)=[];
+Xr=reshape(XX,(nvar-1)*m,n);
+V=filtro(Xr,type,par,f,polycall);
+polycall=false;
+[VN, ifail]=vnorma(VT,V,VV);
+if ifail>0
+    rr=0;
+    pp=0;
+    return
+end
+xv=x-V*V'*x;
+[rrt, ppt]=corr(xv,VN);
+[nr, nc]=size(rrt);
+rr=zeros(nvar,nr,nc);pp=rr;
+%%%%%%
 for i=1:nvar
     XX=X;
     XX(i,:,:)=[];
     Xr=reshape(XX,(nvar-1)*m,n);
     V=filtro(Xr,type,par,f,polycall);
     polycall=false;
-    [VN ifail]=vnorma(VT,V,VV);
+    [VN, ifail]=vnorma(VT,V,VV);
     if ifail>0
         rr=0;
         pp=0;
@@ -44,7 +62,6 @@ for i=1:nvar
     end
     xv=x-V*V'*x;
     [rrt, ppt]=corr(xv,VN);
-    [nr, nc]=size(rrt);
     rr(i,1:nr,1:nc)=rrt;
     pp(i,1:nr,1:nc)=ppt;
     rr(i,i,1:nc)=0;
@@ -63,4 +80,3 @@ elseif corrtype=="FDR"
 else
     error('corrtype must be "Bonferroni" or "FDR"')
 end
-
