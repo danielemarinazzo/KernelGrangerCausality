@@ -50,7 +50,7 @@ for i=1:nvar
     rr(i,i,1:nc)=0;
     kk=kk+(nr-1)*nc;
 end
-rn=rr.^2;save pp pp
+rn=rr.^2;
 if corrtype=="Bonferroni"
     thb=th/kk;
     indpr=pp>thb;
