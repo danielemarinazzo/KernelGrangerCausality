@@ -1,4 +1,4 @@
-function [V D ifail]=filtro(X,type,p,f,polycall)
+function [V, D, ifail]=filtro(X,type,p,f,polycall)
 global term
 if nargin<5
     polycall=true;
@@ -6,7 +6,7 @@ end
 if nargin<4
     f=1.e-6;
 end
-[m n]=size(X);
+[m, n]=size(X);
 if type=='g'
     fast=false;
     rmax=n;
@@ -16,28 +16,32 @@ else
 end
 if fast
     %polynomial kernel (p+m)!/(p!m!)-1< rmax'
-    [L ifail]=Leval(X,m,p,polycall);
+    [L, ifail]=Leval(X,m,p,polycall);
     if ifail>0
-        v=0;
+        V=0;
+        warning('fail')
         return
     end
-    [VN D]=eig(L'*L);
+    [VN, D]=eig(L'*L);
+    save test_fast L
     V=L*VN;
     ifail=0;
 else
-    [L P ifa]=cholesky(X,type,p,rmax,f);
+    [L, P, ifa]=cholesky(X,type,p,rmax,f);
     if ifa
         ifail=1;
         V=0;
+        warning('fail')
         return
     end
     ifail=0;
-    [VN D]=eig(L'*L);
+    [VN, D]=eig(L'*L);
+    save test_chol L P
     V=L(P,:)*VN;
 end
 xnorm=repmat(sqrt(dot(V,V)),n,1);
 V=V./xnorm;
-[s ind]=sort(abs(diag(D)),'descend');
+[s, ind]=sort(abs(diag(D)),'descend');
 r=sum(s>f*s(1));
 ind=ind(1:r);
 V=V(:,ind);

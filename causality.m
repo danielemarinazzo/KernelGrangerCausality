@@ -31,22 +31,22 @@ VT=VV*D.^0.5;
 polycall=true;
 kk=0;
 
-%%% this loop just to initialize the rr matrix %%%
-XX=X;
-XX(1,:,:)=[];
-Xr=reshape(XX,(nvar-1)*m,n);
-V=filtro(Xr,type,par,f,polycall);
-polycall=false;
-[VN, ifail]=vnorma(VT,V,VV);
-if ifail>0
-    rr=0;
-    pp=0;
-    return
-end
-xv=x-V*V'*x;
-[rrt, ppt]=corr(xv,VN);
-[nr, nc]=size(rrt);
-rr=zeros(nvar,nr,nc);pp=rr;
+%%% this loop just to initialize the rr matrix, but it fails sometimes, removed for now %%%
+% XX=X;
+% XX(1,:,:)=[];
+% Xr=reshape(XX,(nvar-1)*m,n);
+% V=filtro(Xr,type,par,f,polycall);
+% polycall=false;
+% [VN, ifail]=vnorma(VT,V,VV);
+% if ifail>0
+%     rr=0;
+%     pp=0;
+%     return
+% end
+% xv=x-V*V'*x;
+% [rrt, ppt]=corr(xv,VN);
+% [nr, nc]=size(rrt);
+% rr=zeros(nvar,nr,nc);pp=rr;
 %%%%%%
 for i=1:nvar
     XX=X;
@@ -58,10 +58,12 @@ for i=1:nvar
     if ifail>0
         rr=0;
         pp=0;
+        disp('vnorma failed')
         return
     end
     xv=x-V*V'*x;
     [rrt, ppt]=corr(xv,VN);
+    [nr, nc]=size(rrt);
     rr(i,1:nr,1:nc)=rrt;
     pp(i,1:nr,1:nc)=ppt;
     rr(i,i,1:nc)=0;
