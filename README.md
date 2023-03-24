@@ -16,21 +16,16 @@ http://journals.aps.org/prl/abstract/10.1103/PhysRevLett.100.144103
 
 https://arxiv.org/pdf/0711.2643.pdf
 
-The folder contains two toolboxes
-
-Kernel causality last
-
-LOO_crossvalidation for choosing the model order
-
-unzip these two toolboxes with the other MATLAB toolboxes and add them to your path. 
 
 You will find among others the scripts: 
 
-test_KGC_KCL: run kernel causality on a simulated network of 5 nodes
+`test_KGC_KCL` run kernel causality on a simulated network of 5 nodes
 
-test_biv_2n: test KGC on two coupled maps
+`test_biv_2n`: test KGC on two coupled maps
 
-test_var_eps_1: modulation in time of the coupling parameter for the two coupled maps (contains calls to Granger causality and correlation with sliding window)
+`test_var_eps_1`: modulation in time of the coupling parameter for the two coupled maps (contains calls to Granger causality and correlation with sliding window)
+
+`run_crossvalidation`: estimate the model order using leave-one-out crossvalidation
 
 Please do not hesitate to contact us for suggestions and remarks http://ost.io/@danielemarinazzo
 
