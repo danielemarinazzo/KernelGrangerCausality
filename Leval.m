@@ -1,4 +1,4 @@
-function [L ifail]=Leval(X,m,p,polycall);
+function [L, ifail]=Leval(X,m,p,polycall)
 global term
 clear L
 switch p
@@ -42,7 +42,9 @@ switch p
         end
     otherwise
         if polycall
-            [term ifail]=polypower('X',m,p);
+            [term, ifail]=polypower('X',m,p);
+        else
+            ifail=0;
         end
         if ifail>0
             L=0;
