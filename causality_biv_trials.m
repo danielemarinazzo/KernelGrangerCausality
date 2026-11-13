@@ -1,4 +1,4 @@
-function [cb cbt]=causality_biv_trials(y,xt,type,par,m,ntrials,th)
+function [cb cbt]=causality_biv_trials(y,xt,type,par,m,ntrials,th,testtype)
 % Input:    y       : matrix (n x 1) of driver data;
 %           xt       : matrix (n x 1) of target data
 %                       nvar = number of conditioning time series
@@ -6,12 +6,21 @@ function [cb cbt]=causality_biv_trials(y,xt,type,par,m,ntrials,th)
 %           type    : kernel function 'p' polynomial 'g' gaussian ;
 %           par     : parameter of the kernel function;
 %           m       : order of the model
+%           th      : significance threshold (Bonferroni corrected inside);
+%           testtype: test on the correlations ('standard'(default), 'bartlett' or 'lambda');
+%                       standard = t-test, n-2 dof
+%                       bartlett = dof corrected for autocorrelation within trials (corr_pval_bartlett)
+%                       lambda   = one test for the whole link (lambda_test_bartlett)
 % Output:   cb      :  y->xt
+%                       lambda: cb = -log(lam) if p<th, 0 otherwise
 %           ifail   :  0 no error
 %                      1 cholesky algoritm fail
 %                      2 complex eigensystem
 %                      3 error in polypower
 %Last version now
+if nargin<8
+    testtype='standard';
+end
 n=length(y);
 % for i=1:nvar;
 %     Y(:,i)=(Y(:,i)-mean(Y(:,i)))/std(Y(:,i));
@@ -81,7 +90,21 @@ if ifail>0
     return
 end
 xv=x-V*V'*x;
-[rrt, ppt]=corr(xv,VN);
+if testtype=="standard"
+    [rrt, ppt]=corr(xv,VN);
+elseif testtype=="bartlett"
+    [rrt, ppt]=corr_pval_bartlett(xv,VN,size(V,2),[],N-order);
+elseif testtype=="lambda"
+    rrt=corr(xv,VN);
+    cbt=sum(rrt.^2);
+    [lam, pl]=lambda_test_bartlett(xv,VN,size(V,2),[],N-order);
+    if pl<th
+        cb=-log(lam);
+    end
+    return
+else
+    error('testtype must be "standard", "bartlett" or "lambda"')
+end
 
 rn=rrt.^2;
 cbt=sum(rn);
